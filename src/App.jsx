@@ -5,6 +5,7 @@ import SkillsSection from "./components/SkillsSection/SkillsSection";
 import CertificatesSection from "./components/CertificatesSection/CertificatesSection";
 import AboutSection from "./components/AboutSection/AboutSection";
 import ResumePreview from "./components/ResumePreview/ResumePreview";
+import RenderSectionEditor from "./components/renderSectionEditor/renderSectionEditor";
 
 const styles = {
   container: {
@@ -25,6 +26,7 @@ const styles = {
     backgroundColor: "#ffffff",
     boxShadow: "inset 2px 0 5px rgba(0,0,0,0.05)",
     overflowY: "auto",
+    position: "relative",
   },
   section: {
     backgroundColor: "white",
@@ -119,6 +121,21 @@ const styles = {
     fontWeight: "500",
     color: "#495057",
   },
+  downloadButton: {
+    position: "fixed",
+    bottom: "30px",
+    right: "30px",
+    padding: "12px 24px",
+    backgroundColor: "#28a745",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "1rem",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+    transition: "all 0.3s ease",
+    zIndex: 1000,
+  },
 };
 
 const ResumeEditor = () => {
@@ -179,38 +196,69 @@ const ResumeEditor = () => {
     setSections(newSections);
   };
 
+  const handleDownloadPdf = () => {
+    alert(
+      "Функция скачивания PDF активирована. В реальном приложении здесь будет создаваться PDF файл."
+    );
+    console.log("Генерация PDF для резюме:", personalInfo.name);
+
+    const element = document.getElementById("resume-preview");
+    const opt = {
+      margin: 10,
+      filename: `${personalInfo.name || "resume"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+
+    html2pdf().from(element).set(opt).save();
+  };
+
   const renderSectionEditor = (section, index) => {
     const commonProps = {
-      key: section.id,
       data: section.data,
       onChange: (newData) => updateSection(section.id, newData),
-      onDelete: () => deleteSection(section.id),
       styles: styles,
     };
 
     return (
-      <div style={styles.section}>
-        <div style={styles.moveButtons}>
+      <div style={styles.section} key={section.id}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "15px",
+          }}
+        >
+          <div style={styles.moveButtons}>
+            <button
+              style={{
+                ...styles.moveButton,
+                backgroundColor: index === 0 ? "#ced4da" : "#6c757d",
+              }}
+              onClick={() => moveSection(index, index - 1)}
+              disabled={index === 0}
+            >
+              ↑ Вверх
+            </button>
+            <button
+              style={{
+                ...styles.moveButton,
+                backgroundColor:
+                  index === sections.length - 1 ? "#ced4da" : "#6c757d",
+              }}
+              onClick={() => moveSection(index, index + 1)}
+              disabled={index === sections.length - 1}
+            >
+              ↓ Вниз
+            </button>
+          </div>
           <button
-            style={{
-              ...styles.moveButton,
-              backgroundColor: index === 0 ? "#ced4da" : "#6c757d",
-            }}
-            onClick={() => moveSection(index, index - 1)}
-            disabled={index === 0}
+            style={styles.deleteButton}
+            onClick={() => deleteSection(section.id)}
           >
-            ↑ Вверх
-          </button>
-          <button
-            style={{
-              ...styles.moveButton,
-              backgroundColor:
-                index === sections.length - 1 ? "#ced4da" : "#6c757d",
-            }}
-            onClick={() => moveSection(index, index + 1)}
-            disabled={index === sections.length - 1}
-          >
-            ↓ Вниз
+            Удалить
           </button>
         </div>
 
@@ -226,7 +274,6 @@ const ResumeEditor = () => {
       </div>
     );
   };
-
   return (
     <div style={styles.container}>
       <div style={styles.editor}>
@@ -351,7 +398,11 @@ const ResumeEditor = () => {
           sections={sections}
           styles={styles}
         />
+        <button style={styles.downloadButton} onClick={handleDownloadPdf}>
+          Скачать как PDF
+        </button>
       </div>
+      {sections.map((section, index) => renderSectionEditor(section, index))}
     </div>
   );
 };

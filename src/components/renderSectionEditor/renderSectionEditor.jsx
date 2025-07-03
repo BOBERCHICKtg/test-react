@@ -1,29 +1,38 @@
-import React from "react";
+// ResumeEditor.jsx (только измененные части)
 
-const renderSectionEditor = () => {
+const RenderSectionEditor = (section, index) => {
   const commonProps = {
     key: section.id,
     data: section.data,
     onChange: (newData) => updateSection(section.id, newData),
     onDelete: () => deleteSection(section.id),
+    styles: styles,
   };
 
   return (
-    <div>
-      <div style={styles.moveButtons}>
+    <div style={styles.section}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div style={styles.moveButtons}>
+          <button
+            style={styles.moveButton}
+            onClick={() => moveSection(index, index - 1)}
+            disabled={index === 0}
+          >
+            ↑ Вверх
+          </button>
+          <button
+            style={styles.moveButton}
+            onClick={() => moveSection(index, index + 1)}
+            disabled={index === sections.length - 1}
+          >
+            ↓ Вниз
+          </button>
+        </div>
         <button
-          style={styles.moveButton}
-          onClick={() => moveSection(index, index - 1)}
-          disabled={index === 0}
+          style={styles.deleteButton}
+          onClick={() => deleteSection(section.id)}
         >
-          ↑ Вверх
-        </button>
-        <button
-          style={styles.moveButton}
-          onClick={() => moveSection(index, index + 1)}
-          disabled={index === sections.length - 1}
-        >
-          ↓ Вниз
+          Удалить
         </button>
       </div>
 
@@ -38,4 +47,4 @@ const renderSectionEditor = () => {
   );
 };
 
-export default renderSectionEditor;
+export default RenderSectionEditor;

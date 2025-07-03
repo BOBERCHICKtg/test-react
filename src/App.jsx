@@ -7,6 +7,8 @@ import AboutSection from "./components/AboutSection/AboutSection";
 import ResumePreview from "./components/ResumePreview/ResumePreview";
 import RenderSectionEditor from "./components/renderSectionEditor/renderSectionEditor";
 
+import html2pdf from "html2pdf.js";
+
 const styles = {
   container: {
     display: "flex",
@@ -274,6 +276,7 @@ const ResumeEditor = () => {
       </div>
     );
   };
+
   return (
     <div style={styles.container}>
       <div style={styles.editor}>
@@ -402,7 +405,6 @@ const ResumeEditor = () => {
           Скачать как PDF
         </button>
       </div>
-      {sections.map((section, index) => renderSectionEditor(section, index))}
     </div>
   );
 };

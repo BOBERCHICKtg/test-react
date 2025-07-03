@@ -1,341 +1,143 @@
 import React, { useState, useEffect } from "react";
+import ExperienceSection from "./components/ExperienceSection/ExperienceSection";
+import EducationSection from "./components/EducationSection/EducationSection";
+import SkillsSection from "./components/SkillsSection/SkillsSection";
+import CertificatesSection from "./components/CertificatesSection/CertificatesSection";
+import AboutSection from "./components/AboutSection/AboutSection";
+import ResumePreview from "./components/ResumePreview/ResumePreview";
+import RenderSectionEditor from "./components/renderSectionEditor/renderSectionEditor";
 
-// Стили компонентов
 const styles = {
   container: {
     display: "flex",
     minHeight: "100vh",
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
   editor: {
     flex: 1,
     padding: "20px",
-    backgroundColor: "#f5f5f5",
-    borderRight: "1px solid #ddd",
+    backgroundColor: "#f8f9fa",
+    borderRight: "1px solid #dee2e6",
+    overflowY: "auto",
   },
   preview: {
     flex: 1,
     padding: "20px",
-    backgroundColor: "#fff",
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+    backgroundColor: "#ffffff",
+    boxShadow: "inset 2px 0 5px rgba(0,0,0,0.05)",
+    overflowY: "auto",
+    position: "relative",
   },
   section: {
     backgroundColor: "white",
-    padding: "15px",
-    marginBottom: "15px",
-    borderRadius: "5px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+    padding: "20px",
+    marginBottom: "20px",
+    borderRadius: "8px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
     position: "relative",
   },
   resume: {
     maxWidth: "800px",
     margin: "0 auto",
     padding: "30px",
-    border: "1px solid #ddd",
+    border: "1px solid #e9ecef",
     backgroundColor: "white",
+    boxShadow: "0 0 15px rgba(0,0,0,0.05)",
   },
   header: {
-    borderBottom: "2px solid #3498db",
-    paddingBottom: "10px",
-    marginBottom: "20px",
+    borderBottom: "2px solid #0d6efd",
+    paddingBottom: "15px",
+    marginBottom: "25px",
+    color: "#212529",
   },
   sectionTitle: {
-    color: "#3498db",
-    borderBottom: "1px solid #eee",
-    paddingBottom: "5px",
-    marginTop: "20px",
+    color: "#0d6efd",
+    borderBottom: "1px solid #e9ecef",
+    paddingBottom: "8px",
+    marginTop: "25px",
+    fontSize: "1.25rem",
   },
   addButton: {
-    padding: "10px 15px",
-    backgroundColor: "#3498db",
+    padding: "10px 20px",
+    backgroundColor: "#0d6efd",
     color: "white",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: "6px",
     cursor: "pointer",
     marginBottom: "20px",
+    fontSize: "1rem",
+    transition: "all 0.2s ease",
   },
   deleteButton: {
-    backgroundColor: "#e74c3c",
+    backgroundColor: "#dc3545",
     color: "white",
     border: "none",
-    borderRadius: "3px",
-    padding: "5px 10px",
+    borderRadius: "4px",
+    padding: "6px 12px",
     cursor: "pointer",
     position: "absolute",
     top: "15px",
     right: "15px",
+    fontSize: "0.875rem",
+    transition: "all 0.2s ease",
   },
   moveButtons: {
     display: "flex",
-    gap: "5px",
-    marginBottom: "10px",
+    gap: "8px",
+    marginBottom: "15px",
   },
   moveButton: {
-    padding: "5px 10px",
-    backgroundColor: "#95a5a6",
+    padding: "6px 12px",
+    backgroundColor: "#6c757d",
     color: "white",
     border: "none",
-    borderRadius: "3px",
+    borderRadius: "4px",
     cursor: "pointer",
+    fontSize: "0.875rem",
+    transition: "all 0.2s ease",
   },
   input: {
     width: "100%",
-    padding: "8px",
-    margin: "5px 0 15px",
-    border: "1px solid #ddd",
-    borderRadius: "4px",
+    padding: "10px",
+    margin: "8px 0 16px",
+    border: "1px solid #ced4da",
+    borderRadius: "6px",
+    fontSize: "1rem",
+    transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
   },
   textarea: {
     width: "100%",
-    padding: "8px",
-    margin: "5px 0 15px",
-    border: "1px solid #ddd",
-    borderRadius: "4px",
-    minHeight: "60px",
+    padding: "10px",
+    margin: "8px 0 16px",
+    border: "1px solid #ced4da",
+    borderRadius: "6px",
+    minHeight: "100px",
+    fontSize: "1rem",
+    resize: "vertical",
+  },
+  label: {
+    display: "block",
+    marginBottom: "5px",
+    fontWeight: "500",
+    color: "#495057",
+  },
+  downloadButton: {
+    position: "fixed",
+    bottom: "30px",
+    right: "30px",
+    padding: "12px 24px",
+    backgroundColor: "#28a745",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "1rem",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+    transition: "all 0.3s ease",
+    zIndex: 1000,
   },
 };
 
-// Компонент секции "Опыт работы"
-const ExperienceSection = ({ data, onChange, onDelete }) => {
-  return (
-    <div style={styles.section}>
-      <button style={styles.deleteButton} onClick={onDelete}>
-        Удалить
-      </button>
-      <h3>Опыт работы</h3>
-      <div>
-        <label>Должность</label>
-        <input
-          style={styles.input}
-          value={data.position || ""}
-          onChange={(e) => onChange({ ...data, position: e.target.value })}
-        />
-      </div>
-      <div>
-        <label>Компания</label>
-        <input
-          style={styles.input}
-          value={data.company || ""}
-          onChange={(e) => onChange({ ...data, company: e.target.value })}
-        />
-      </div>
-      <div>
-        <label>Период</label>
-        <input
-          style={styles.input}
-          value={data.period || ""}
-          onChange={(e) => onChange({ ...data, period: e.target.value })}
-        />
-      </div>
-      <div>
-        <label>Описание</label>
-        <textarea
-          style={styles.textarea}
-          value={data.description || ""}
-          onChange={(e) => onChange({ ...data, description: e.target.value })}
-        />
-      </div>
-    </div>
-  );
-};
-
-// Компонент секции "Образование"
-const EducationSection = ({ data, onChange, onDelete }) => {
-  return (
-    <div style={styles.section}>
-      <button style={styles.deleteButton} onClick={onDelete}>
-        Удалить
-      </button>
-      <h3>Образование</h3>
-      <div>
-        <label>Учебное заведение</label>
-        <input
-          style={styles.input}
-          value={data.institution || ""}
-          onChange={(e) => onChange({ ...data, institution: e.target.value })}
-        />
-      </div>
-      <div>
-        <label>Специальность</label>
-        <input
-          style={styles.input}
-          value={data.specialty || ""}
-          onChange={(e) => onChange({ ...data, specialty: e.target.value })}
-        />
-      </div>
-      <div>
-        <label>Период</label>
-        <input
-          style={styles.input}
-          value={data.period || ""}
-          onChange={(e) => onChange({ ...data, period: e.target.value })}
-        />
-      </div>
-    </div>
-  );
-};
-
-// Компонент секции "Навыки"
-const SkillsSection = ({ data, onChange, onDelete }) => {
-  return (
-    <div style={styles.section}>
-      <button style={styles.deleteButton} onClick={onDelete}>
-        Удалить
-      </button>
-      <h3>Навыки</h3>
-      <div>
-        <label>Список навыков (через запятую)</label>
-        <input
-          style={styles.input}
-          value={data.skills || ""}
-          onChange={(e) => onChange({ ...data, skills: e.target.value })}
-          placeholder="HTML, CSS, JavaScript, React"
-        />
-      </div>
-    </div>
-  );
-};
-
-// Компонент секции "Сертификаты"
-const CertificatesSection = ({ data, onChange, onDelete }) => {
-  return (
-    <div style={styles.section}>
-      <button style={styles.deleteButton} onClick={onDelete}>
-        Удалить
-      </button>
-      <h3>Сертификаты</h3>
-      <div>
-        <label>Название сертификата</label>
-        <input
-          style={styles.input}
-          value={data.name || ""}
-          onChange={(e) => onChange({ ...data, name: e.target.value })}
-        />
-      </div>
-      <div>
-        <label>Организация</label>
-        <input
-          style={styles.input}
-          value={data.organization || ""}
-          onChange={(e) => onChange({ ...data, organization: e.target.value })}
-        />
-      </div>
-      <div>
-        <label>Год получения</label>
-        <input
-          style={styles.input}
-          value={data.year || ""}
-          onChange={(e) => onChange({ ...data, year: e.target.value })}
-        />
-      </div>
-    </div>
-  );
-};
-
-// Компонент секции "О себе"
-const AboutSection = ({ data, onChange, onDelete }) => {
-  return (
-    <div style={styles.section}>
-      <button style={styles.deleteButton} onClick={onDelete}>
-        Удалить
-      </button>
-      <h3>О себе</h3>
-      <div>
-        <label>Информация о себе</label>
-        <textarea
-          style={styles.textarea}
-          value={data.content || ""}
-          onChange={(e) => onChange({ ...data, content: e.target.value })}
-        />
-      </div>
-    </div>
-  );
-};
-
-// Компонент предпросмотра резюме
-const ResumePreview = ({ personalInfo, sections }) => {
-  return (
-    <div style={styles.resume}>
-      <div style={styles.header}>
-        <h1>{personalInfo.name || "Ваше имя"}</h1>
-        <p>{personalInfo.title || "Ваша должность"}</p>
-        <p>
-          {personalInfo.email || "email@example.com"} |{" "}
-          {personalInfo.phone || "+7 (123) 456-7890"}
-        </p>
-      </div>
-
-      {sections.map((section, index) => {
-        switch (section.type) {
-          case "experience":
-            return (
-              <div key={index}>
-                <h2 style={styles.sectionTitle}>Опыт работы</h2>
-                <h3>{section.data.position || "Должность"}</h3>
-                <p>
-                  <strong>{section.data.company || "Компания"}</strong> |{" "}
-                  {section.data.period || "Период"}
-                </p>
-                <p>
-                  {section.data.description ||
-                    "Описание ваших обязанностей и достижений."}
-                </p>
-              </div>
-            );
-          case "education":
-            return (
-              <div key={index}>
-                <h2 style={styles.sectionTitle}>Образование</h2>
-                <h3>{section.data.institution || "Учебное заведение"}</h3>
-                <p>
-                  <strong>{section.data.specialty || "Специальность"}</strong> |{" "}
-                  {section.data.period || "Период"}
-                </p>
-              </div>
-            );
-          case "skills":
-            return (
-              <div key={index}>
-                <h2 style={styles.sectionTitle}>Навыки</h2>
-                <ul>
-                  {(section.data.skills || "Навык 1, Навык 2")
-                    .split(",")
-                    .map((skill, i) => (
-                      <li key={i}>{skill.trim()}</li>
-                    ))}
-                </ul>
-              </div>
-            );
-          case "certificates":
-            return (
-              <div key={index}>
-                <h2 style={styles.sectionTitle}>Сертификаты</h2>
-                <p>
-                  <strong>{section.data.name || "Название сертификата"}</strong>{" "}
-                  - {section.data.organization || "Организация"} (
-                  {section.data.year || "Год"})
-                </p>
-              </div>
-            );
-          case "about":
-            return (
-              <div key={index}>
-                <h2 style={styles.sectionTitle}>О себе</h2>
-                <p>
-                  {section.data.content ||
-                    "Краткая информация о вас, ваших интересах и целях."}
-                </p>
-              </div>
-            );
-          default:
-            return null;
-        }
-      })}
-    </div>
-  );
-};
-
-// Основной компонент приложения
 const ResumeEditor = () => {
   const [personalInfo, setPersonalInfo] = useState({
     name: "",
@@ -347,7 +149,6 @@ const ResumeEditor = () => {
   const [sections, setSections] = useState([]);
   const [showAddSection, setShowAddSection] = useState(false);
 
-  // Загрузка данных из localStorage при монтировании
   useEffect(() => {
     const savedResume = localStorage.getItem("resumeData");
     if (savedResume) {
@@ -358,7 +159,6 @@ const ResumeEditor = () => {
     }
   }, []);
 
-  // Сохранение данных в localStorage при изменении
   useEffect(() => {
     const resumeData = { personalInfo, sections };
     localStorage.setItem("resumeData", JSON.stringify(resumeData));
@@ -396,30 +196,69 @@ const ResumeEditor = () => {
     setSections(newSections);
   };
 
+  const handleDownloadPdf = () => {
+    alert(
+      "Функция скачивания PDF активирована. В реальном приложении здесь будет создаваться PDF файл."
+    );
+    console.log("Генерация PDF для резюме:", personalInfo.name);
+
+    const element = document.getElementById("resume-preview");
+    const opt = {
+      margin: 10,
+      filename: `${personalInfo.name || "resume"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+
+    html2pdf().from(element).set(opt).save();
+  };
+
   const renderSectionEditor = (section, index) => {
     const commonProps = {
-      key: section.id,
       data: section.data,
       onChange: (newData) => updateSection(section.id, newData),
-      onDelete: () => deleteSection(section.id),
+      styles: styles,
     };
 
     return (
-      <div>
-        <div style={styles.moveButtons}>
+      <div style={styles.section} key={section.id}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "15px",
+          }}
+        >
+          <div style={styles.moveButtons}>
+            <button
+              style={{
+                ...styles.moveButton,
+                backgroundColor: index === 0 ? "#ced4da" : "#6c757d",
+              }}
+              onClick={() => moveSection(index, index - 1)}
+              disabled={index === 0}
+            >
+              ↑ Вверх
+            </button>
+            <button
+              style={{
+                ...styles.moveButton,
+                backgroundColor:
+                  index === sections.length - 1 ? "#ced4da" : "#6c757d",
+              }}
+              onClick={() => moveSection(index, index + 1)}
+              disabled={index === sections.length - 1}
+            >
+              ↓ Вниз
+            </button>
+          </div>
           <button
-            style={styles.moveButton}
-            onClick={() => moveSection(index, index - 1)}
-            disabled={index === 0}
+            style={styles.deleteButton}
+            onClick={() => deleteSection(section.id)}
           >
-            ↑ Вверх
-          </button>
-          <button
-            style={styles.moveButton}
-            onClick={() => moveSection(index, index + 1)}
-            disabled={index === sections.length - 1}
-          >
-            ↓ Вниз
+            Удалить
           </button>
         </div>
 
@@ -435,15 +274,13 @@ const ResumeEditor = () => {
       </div>
     );
   };
-
   return (
     <div style={styles.container}>
-      {/* Левый блок - редактор */}
       <div style={styles.editor}>
-        <h2>Персональная информация</h2>
         <div style={styles.section}>
+          <h2 style={styles.header}>Персональная информация</h2>
           <div>
-            <label>ФИО</label>
+            <label style={styles.label}>ФИО</label>
             <input
               style={styles.input}
               value={personalInfo.name}
@@ -453,7 +290,7 @@ const ResumeEditor = () => {
             />
           </div>
           <div>
-            <label>Должность</label>
+            <label style={styles.label}>Должность</label>
             <input
               style={styles.input}
               value={personalInfo.title}
@@ -463,7 +300,7 @@ const ResumeEditor = () => {
             />
           </div>
           <div>
-            <label>Email</label>
+            <label style={styles.label}>Email</label>
             <input
               style={styles.input}
               value={personalInfo.email}
@@ -473,7 +310,7 @@ const ResumeEditor = () => {
             />
           </div>
           <div>
-            <label>Телефон</label>
+            <label style={styles.label}>Телефон</label>
             <input
               style={styles.input}
               value={personalInfo.phone}
@@ -484,37 +321,54 @@ const ResumeEditor = () => {
           </div>
         </div>
 
-        <h2>Секции резюме</h2>
-        <button
-          style={styles.addButton}
-          onClick={() => setShowAddSection(!showAddSection)}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-          Добавить секцию
-        </button>
+          <h2 style={styles.header}>Секции резюме</h2>
+          <button
+            style={{
+              ...styles.addButton,
+              backgroundColor: showAddSection ? "#6c757d" : "#0d6efd",
+            }}
+            onClick={() => setShowAddSection(!showAddSection)}
+          >
+            {showAddSection ? "Скрыть" : "Добавить секцию"}
+          </button>
+        </div>
 
         {showAddSection && (
-          <div style={styles.section}>
-            <h3>Выберите тип секции</h3>
+          <div
+            style={{
+              ...styles.section,
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
             <button
-              style={{ ...styles.addButton, marginRight: "10px" }}
+              style={styles.addButton}
               onClick={() => addSection("experience")}
             >
               Опыт работы
             </button>
             <button
-              style={{ ...styles.addButton, marginRight: "10px" }}
+              style={styles.addButton}
               onClick={() => addSection("education")}
             >
               Образование
             </button>
             <button
-              style={{ ...styles.addButton, marginRight: "10px" }}
+              style={styles.addButton}
               onClick={() => addSection("skills")}
             >
               Навыки
             </button>
             <button
-              style={{ ...styles.addButton, marginRight: "10px" }}
+              style={styles.addButton}
               onClick={() => addSection("certificates")}
             >
               Сертификаты
@@ -529,15 +383,26 @@ const ResumeEditor = () => {
         )}
 
         {sections.map((section, index) => (
-          <div key={section.id}>{renderSectionEditor(section, index)}</div>
+          <React.Fragment key={section.id}>
+            {renderSectionEditor(section, index)}
+          </React.Fragment>
         ))}
       </div>
 
-      {/* Правый блок - предпросмотр */}
       <div style={styles.preview}>
-        <h2>Предпросмотр резюме</h2>
-        <ResumePreview personalInfo={personalInfo} sections={sections} />
+        <h2 style={{ ...styles.header, textAlign: "center" }}>
+          Предпросмотр резюме
+        </h2>
+        <ResumePreview
+          personalInfo={personalInfo}
+          sections={sections}
+          styles={styles}
+        />
+        <button style={styles.downloadButton} onClick={handleDownloadPdf}>
+          Скачать как PDF
+        </button>
       </div>
+      {sections.map((section, index) => renderSectionEditor(section, index))}
     </div>
   );
 };
